@@ -15,4 +15,8 @@ public interface UserServices {
     String withdraw(WithdrawalDto withdrawalDto);
 
     String transfer(TransferDto transferDto, DepositDto depositDto);
+
+    String balance(BalanceDto balanceDto);
+
+    String rechargeAirTime(RechargeAirTimeDto rechargeAirTimeDto);
 }
