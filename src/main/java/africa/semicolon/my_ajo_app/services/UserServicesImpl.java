@@ -2,8 +2,7 @@ package africa.semicolon.my_ajo_app.services;
 
 import africa.semicolon.my_ajo_app.data.models.User;
 import africa.semicolon.my_ajo_app.data.repositories.UserRepository;
-import africa.semicolon.my_ajo_app.data.requestDto.LoginDto;
-import africa.semicolon.my_ajo_app.data.requestDto.RegisterDto;
+import africa.semicolon.my_ajo_app.data.requestDto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,5 +67,54 @@ public class UserServicesImpl implements UserServices {
 
         return String.format("%.2f%S%s%s,", depositDto.getAmount(), " was successfully deposited in to",
                 " account number: ", depositDto.getAccountNumber());
+    }
+
+    @Override
+    public String withdraw(WithdrawalDto withdrawalDto) {
+        User user = userRepository.findByAccountNumber(withdrawalDto.getAccountNumber());
+        double newBalance = 0.0;
+        if (withdrawalDto.getAmount() <= 0.0) {
+            throw new IllegalArgumentException("Amount should be greater than 0");
+        }
+        if (withdrawalDto.getAmount() > user.getBalance()) {
+            throw new IllegalArgumentException("Insufficient Balance");
+        }
+        newBalance = user.getBalance() - withdrawalDto.getAmount();
+        user.setBalance(newBalance);
+        userRepository.save(user);
+
+
+        return String.format("%.2f%s%.2f", withdrawalDto.getAmount(), " was successfully debited from you account." +
+                " your new balance is: ", user.getBalance());
+    }
+
+    @Override
+    public String transfer(TransferDto transferDto, DepositDto depositDto) {
+        User user = userRepository.findByAccountNumber(transferDto.getAccountNumber());
+
+        if (user == null) {
+            throw new IllegalArgumentException("Invalid account number ");
+        }
+
+        if (transferDto.getAmount() > user.getBalance()) {
+            throw new IllegalArgumentException("Insufficient balance");
+        }
+        if (transferDto.getAmount() < 0.0) {
+            throw new IllegalArgumentException("Amount should be greater than 0");
+        }
+        double newBalance = user.getBalance() - transferDto.getAmount();
+        user.setBalance(newBalance);
+
+        User user1 = userRepository.findByAccountNumber(depositDto.getAccountNumber());
+        if (user1 == null) {
+            throw new IllegalArgumentException("Invalid account number ");
+        }
+
+        user1.setBalance(user1.getBalance() + transferDto.getAmount());
+
+        userRepository.save(user);
+        userRepository.save(user1);
+        return String.format("%.2f%s%s", transferDto.getAmount(), " was successfully transferred to ",
+                depositDto.getAccountNumber());
     }
 }
