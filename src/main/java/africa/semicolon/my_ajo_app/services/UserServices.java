@@ -18,5 +18,5 @@ public interface UserServices {
 
     String balance(BalanceDto balanceDto);
 
-    String rechargeAirTime(RechargeAirTimeDto rechargeAirTimeDto);
+    String rechargeAirtime(RechargeAirtimeDto rechargeAirtimeDto);
 }

@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.Setter;
 
 @Data
-public class RechargeAirTimeDto {
+public class RechargeAirtimeDto {
     @Setter
     private String phoneNumber;
     private String accountNumber;

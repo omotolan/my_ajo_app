@@ -138,22 +138,22 @@ public class UserServicesImpl implements UserServices {
 
 
     @Override
-    public String rechargeAirTime(RechargeAirTimeDto rechargeAirTimeDto) {
-        User user = userRepository.findByAccountNumber(rechargeAirTimeDto.getAccountNumber());
+    public String rechargeAirtime(RechargeAirtimeDto rechargeAirtimeDto) {
+        User user = userRepository.findByAccountNumber(rechargeAirtimeDto.getAccountNumber());
 
-        if (rechargeAirTimeDto.getAmount() < 0) {
+        if (rechargeAirtimeDto.getAmount() < 0) {
             throw new IllegalArgumentException("Amount has to be greater than 0");
         }
-        if (rechargeAirTimeDto.getAmount() > 10000.0) {
+        if (rechargeAirtimeDto.getAmount() > 10000.0) {
             throw new IllegalArgumentException("Amount exceeds recharge limit");
         }
-        if (rechargeAirTimeDto.getAmount() > user.getBalance()) {
+        if (rechargeAirtimeDto.getAmount() > user.getBalance()) {
             throw new IllegalArgumentException("Insufficient balance");
         }
 
-        user.setBalance(user.getBalance() - rechargeAirTimeDto.getAmount());
+        user.setBalance(user.getBalance() - rechargeAirtimeDto.getAmount());
         userRepository.save(user);
-        
-        return rechargeAirTimeDto.getPhoneNumber() + " successfully recharged with: " + rechargeAirTimeDto.getAmount();
+
+        return rechargeAirtimeDto.getPhoneNumber() + " successfully recharged with: " + rechargeAirtimeDto.getAmount();
     }
 }

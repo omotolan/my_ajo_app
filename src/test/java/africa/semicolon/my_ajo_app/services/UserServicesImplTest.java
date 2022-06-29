@@ -102,13 +102,13 @@ class UserServicesImplTest {
     }
     @Test
     public void testThatAirTimeCanBeRechargedFromAccount(){
-        RechargeAirTimeDto rechargeAirTimeDto = new RechargeAirTimeDto();
+        RechargeAirtimeDto rechargeAirtimeDto = new RechargeAirtimeDto();
 
-        rechargeAirTimeDto.setAccountNumber("4995478630");
-        rechargeAirTimeDto.setPhoneNumber("07035428767");
-        rechargeAirTimeDto.setAmount(500.0);
+        rechargeAirtimeDto.setAccountNumber("4995478630");
+        rechargeAirtimeDto.setPhoneNumber("07035428767");
+        rechargeAirtimeDto.setAmount(500.0);
 
-        String response = userServices.rechargeAirTime(rechargeAirTimeDto);
+        String response = userServices.rechargeAirtime(rechargeAirtimeDto);
         assertEquals("07035428767 successfully recharged with: 500.0", response);
     }
 }
