@@ -18,21 +18,22 @@ public class UserServicesImpl implements UserServices {
     public String createAccount(RegisterDto registerDto) {
         User user = new User();
 
+
+       // user = Mapper.map(registerDto);
         user.setName(registerDto.getName());
         user.setEmail(registerDto.getEmail());
         user.setPassword(registerDto.getPassword());
         user.setPin(registerDto.getPin());
         user.setPhoneNumber(registerDto.getPhoneNumber());
 
-        String accountNumber = String.valueOf(UUID.randomUUID().getMostSignificantBits());
-        accountNumber = accountNumber.substring(1, 11);
+        String accountNumber = generateAccountNumber();
         user.setAccountNumber(accountNumber);
 
         if (!Objects.equals(user.getEmail(), registerDto.getEmail())) {
             userRepository.save(user);
 
         } else {
-            throw new IllegalArgumentException("Email already exists.");
+            throwException("Email already exists.");
         }
 
         return "Account Successfully created";
@@ -44,12 +45,11 @@ public class UserServicesImpl implements UserServices {
         User user = userRepository.findByEmail(loginDto.getEmail());
 
         if (user == null) {
-            throw new IllegalArgumentException("Email does not exists");
+            throwException("Email does not exists");
         }
 
         if (!Objects.equals(loginDto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Wrong password");
-
+            throwException("Incorrect password");
         }
 
         return "Successfully logged in";
@@ -61,10 +61,11 @@ public class UserServicesImpl implements UserServices {
         User user = userRepository.findByAccountNumber(depositDto.getAccountNumber());
 
         if (user == null) {
-            throw new IllegalArgumentException("Account number does not exists");
+            throwException("Account number does not exists");
         }
         if (depositDto.getAmount() <= 0) {
-            throw new IllegalArgumentException("Amount should be greater than zero");
+            throwException("Amount should be greater than zero");
+
         }
         user.setBalance(depositDto.getAmount());
         userRepository.save(user);
@@ -79,15 +80,14 @@ public class UserServicesImpl implements UserServices {
         User user = userRepository.findByAccountNumber(withdrawalDto.getAccountNumber());
         double newBalance;
         if (withdrawalDto.getAmount() <= 0.0) {
-            throw new IllegalArgumentException("Amount should be greater than 0");
+            throwException("Amount should be greater than 0");
         }
         if (withdrawalDto.getAmount() > user.getBalance()) {
-            throw new IllegalArgumentException("Insufficient Balance");
+            throwException("Insufficient Balance");
         }
         newBalance = user.getBalance() - withdrawalDto.getAmount();
         user.setBalance(newBalance);
         userRepository.save(user);
-
 
         return String.format("%.2f%s%.2f", withdrawalDto.getAmount(), " was successfully debited from you account." +
                 " your new balance is: ", user.getBalance());
@@ -99,26 +99,24 @@ public class UserServicesImpl implements UserServices {
         User user = userRepository.findByAccountNumber(transferDto.getAccountNumber());
 
         if (user == null) {
-            throw new IllegalArgumentException("Invalid account number ");
+            throwException("Invalid account number ");
         }
-
         if (transferDto.getAmount() > user.getBalance()) {
-            throw new IllegalArgumentException("Insufficient balance");
+            throwException("Insufficient balance");
         }
         if (transferDto.getAmount() < 0.0) {
-            throw new IllegalArgumentException("Amount should be greater than 0");
+            throwException("Amount should be greater than 0");
         }
         double newBalance = user.getBalance() - transferDto.getAmount();
         user.setBalance(newBalance);
         if (!Objects.equals(user.getPin(), transferDto.getPin())) {
-            throw new IllegalArgumentException("pin not correct");
+            throwException("pin not correct");
         }
 
         User user1 = userRepository.findByAccountNumber(depositDto.getAccountNumber());
         if (user1 == null) {
-            throw new IllegalArgumentException("Invalid account number ");
+            throwException("Invalid account number ");
         }
-
 
         user1.setBalance(user1.getBalance() + transferDto.getAmount());
 
@@ -142,18 +140,32 @@ public class UserServicesImpl implements UserServices {
         User user = userRepository.findByAccountNumber(rechargeAirtimeDto.getAccountNumber());
 
         if (rechargeAirtimeDto.getAmount() < 0) {
-            throw new IllegalArgumentException("Amount has to be greater than 0");
+            throwException("Amount has to be greater than 0");
         }
         if (rechargeAirtimeDto.getAmount() > 10000.0) {
-            throw new IllegalArgumentException("Amount exceeds recharge limit");
+            throwException("Amount exceeds recharge limit");
         }
         if (rechargeAirtimeDto.getAmount() > user.getBalance()) {
-            throw new IllegalArgumentException("Insufficient balance");
+            throwException("Insufficient balance");
         }
 
         user.setBalance(user.getBalance() - rechargeAirtimeDto.getAmount());
         userRepository.save(user);
 
         return rechargeAirtimeDto.getPhoneNumber() + " successfully recharged with: " + rechargeAirtimeDto.getAmount();
+    }
+
+    private String generateAccountNumber() {
+
+        String accountNumber = String.valueOf(UUID.randomUUID().getMostSignificantBits());
+        accountNumber = accountNumber.substring(1, 11);
+
+        return accountNumber;
+
+    }
+
+    private void throwException(String message) {
+
+        throw new IllegalArgumentException(message);
     }
 }

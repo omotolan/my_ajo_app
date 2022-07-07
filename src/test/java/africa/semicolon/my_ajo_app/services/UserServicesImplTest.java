@@ -22,7 +22,7 @@ class UserServicesImplTest {
         registerDto.setPhoneNumber("08182769505");
 
 
-//        String response = userServices.createAccount(registerDto);
+        String response = userServices.createAccount(registerDto);
 //        assertEquals("Account Successfully created", response);
         assertThrows(IllegalArgumentException.class, () -> userServices.createAccount(registerDto));
     }
@@ -36,7 +36,7 @@ class UserServicesImplTest {
         registerDto.setPin("4567");
         registerDto.setPin("07035428767");
 
-//         String response = userServices.createAccount(registerDto);
+         String response = userServices.createAccount(registerDto);
 //         assertEquals("Account Successfully created", response);
         assertThrows(IllegalArgumentException.class, () -> userServices.createAccount(registerDto));
     }
